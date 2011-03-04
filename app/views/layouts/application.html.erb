@@ -4,13 +4,14 @@
 		<title><%= title %></title>
 		<%= csrf_meta_tag %>
 		<%= render 'layouts/stylesheets' %>
+		<%= javascript_include_tag :all %>
 	</head>
 	<body>
 		<div class="container">
 			<%= render 'layouts/header' %>
 			<section class="round">
 				<% flash.each do |key, value| %>
-					<div class="flash <%= key %>"><%= value %></div>
+					<%= content_tag(:div, value, :class => "flash #{key}") %>
 				<% end  %>
 				<%= yield %>
 			</section>

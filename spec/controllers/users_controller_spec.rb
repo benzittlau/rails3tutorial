@@ -59,6 +59,22 @@ describe UsersController do
             post :create, :user => @attr
           end.should_not change(User, :count)
         end
+        
+        it "should have the right title" do
+          post :create, :user => @attr
+          response.should have_selector("title", :content => "Sign up")
+        end
+        
+        it "should render the new page" do
+          post :create, :user => @attr
+          response.should render_template('new')
+        end
+        
+        it "should clear the password fields" do
+          post :create, :user => @attr
+          assigns(:user).password.should == nil
+          assigns(:user).password_confirmation.should == nil
+        end
       end
     end
     
@@ -84,6 +100,11 @@ describe UsersController do
       it "should have a flash message" do
         post :create, :user => @attr
         flash[:success].should =~ /welcome to the sample app/i
+      end
+      
+      it "should sign the user in" do
+        post :create, :user => @attr
+        controller.should be_signed_in
       end
 
   end
