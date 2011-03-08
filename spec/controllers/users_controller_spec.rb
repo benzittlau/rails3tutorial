@@ -33,6 +33,13 @@ describe UsersController do
       response.should have_selector("h1>img", :class => "gravatar")
     end
     
+    it "should show the users microposts" do
+      mp1 = Factory(:micropost, :user => @user, :content => "Foo bar")
+      mp2 = Factory(:micropost, :user => @user, :content => "Baz quux")
+      get :show, :id => @user
+      response.should have_selector("span.content", :content => mp1.content)
+      response.should have_selector("span.content", :content => mp2.content)
+    end
   end
 
   describe "GET 'new'" do
@@ -262,6 +269,25 @@ describe UsersController do
         response.should have_selector("a", :href => "/users?page=2", :content => "2")
         response.should have_selector("a", :href => "/users?page=2", :content => "Next")
       end
+      
+      describe "for non-admin users" do
+        it "should not have delete links" do
+          get :index
+          response.should_not have_selector("a", :href => "/users/1", :content => "delete")
+        end
+      end
+      
+      describe "for admin users" do
+        before(:each) do 
+          test_sign_out
+          test_sign_in(Factory(:user, :email => "admin@example.com", :admin => true))
+        end
+        
+        it "should have delete links" do
+          get :index
+          response.should have_selector("a", :href => "/users/1", :content => "delete")
+        end
+      end
     end 
   end
   
@@ -294,7 +320,7 @@ describe UsersController do
       it "should delete the user" do
         lambda do
           delete :destroy, :id => @user
-        end.should  change(User, :count).by(-1)
+        end.should change(User, :count).by(-1)
       end
       
       it "should redirect to the users index page" do

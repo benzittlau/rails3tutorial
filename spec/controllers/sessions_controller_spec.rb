@@ -67,4 +67,26 @@ describe SessionsController do
       response.should redirect_to(root_path)
     end
   end
+  
+  describe "As a signed in user" do
+    before(:each) do
+      @user = Factory(:user)
+      test_sign_in(@user)
+      @attr = {:email => @user.email, :password => @user.password}
+    end
+    
+    describe "when accessing new" do
+      it "should redirect to the root page" do
+        get :new
+        response.should redirect_to(root_path)
+      end
+    end
+    
+    describe "when accessing create" do
+      it "should redirect to the root page" do
+        post :create, :session => @attr
+        response.should redirect_to(root_path)
+      end
+    end
+  end
 end
